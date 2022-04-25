@@ -1,8 +1,8 @@
 #pragma once
 #include <d3d11.h>
 #include "Prerequisites.h"
-
-
+//https://docs.microsoft.com/en-us/windows/win32/gdi/device-contexts
+//Used to Define Graphic Objects and their Attributes
 class DeviceContext
 {
 public:

@@ -7,20 +7,20 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 	ID3D11Device* device = m_system->m_d3d_device;
 
 	DXGI_SWAP_CHAIN_DESC desc;
-	ZeroMemory(&desc, sizeof(desc));
+	ZeroMemory(&desc, sizeof(desc));//Sets Everything to defautl/0
 	desc.BufferCount = 1;
 	desc.BufferDesc.Width = width;
 	desc.BufferDesc.Height = height;
 	desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	desc.BufferDesc.RefreshRate.Numerator = 60;
-	desc.BufferDesc.RefreshRate.Denominator = 1;
+	desc.BufferDesc.RefreshRate.Numerator = 60;//Main Value for FPS
+	desc.BufferDesc.RefreshRate.Denominator = 1;//Used to get Fractional FPS
 	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	desc.OutputWindow = hwnd;
+	desc.OutputWindow = hwnd;//Gives the Window it's targeting
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Windowed = TRUE;
 
-	//Create the swap chain for the window indicated by HWND parameter
+	//Create the Swap Chain for the Window from the HWND parameter
 	HRESULT hr = m_system->m_dxgi_factory->CreateSwapChain(device, &desc, &m_swap_chain);
 
 	if (FAILED(hr))
@@ -28,7 +28,7 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 		throw std::exception("SwapChain not created successfully");
 	}
 
-	//Get the back buffer color and create its render target view
+	//Gets the back Buffer Color
 	ID3D11Texture2D* buffer = NULL;
 	hr = m_swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);
 
@@ -37,6 +37,7 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 		throw std::exception("SwapChain not created successfully");
 	}
 
+	//Create its Render Target View
 	hr = device->CreateRenderTargetView(buffer, NULL, &m_rtv);
 	buffer->Release();
 
@@ -45,6 +46,7 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 		throw std::exception("SwapChain not created successfully");
 	}
 
+	//For Textures
 	D3D11_TEXTURE2D_DESC tex_desc = {};
 	tex_desc.Width = width;
 	tex_desc.Height = height;
@@ -58,13 +60,15 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 	tex_desc.ArraySize = 1;
 	tex_desc.CPUAccessFlags = 0;
 
+	//Creates Texture
 	hr = device->CreateTexture2D(&tex_desc, nullptr, &buffer);
 
 	if (FAILED(hr))
 	{
 		throw std::exception("SwapChain not created successfully");
 	}
-
+	
+	//Creates Depth Stencil View
 	hr = device->CreateDepthStencilView(buffer, NULL, &m_dsv);
 	buffer->Release();
 
@@ -74,8 +78,9 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 	}
 }
 
-bool SwapChain::present(bool vsync)
+bool SwapChain::present(bool vsync)	//Flags of Present Method https://docs.microsoft.com/en-us/windows/win32/direct3ddxgi/dxgi-present
 {
+	//Vsync Option
 	m_swap_chain->Present(vsync, NULL);
 
 	return true;

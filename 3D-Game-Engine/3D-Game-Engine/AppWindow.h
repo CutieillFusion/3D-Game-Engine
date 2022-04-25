@@ -61,4 +61,5 @@ private:
 	float m_forward = 0.0f;
 	float m_rightward = 0.0f;
 	Matrix4x4 m_world_cam;
+	float m_camera_speed = 0.05f;
 };

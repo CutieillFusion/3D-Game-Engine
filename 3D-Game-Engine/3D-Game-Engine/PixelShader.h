@@ -1,7 +1,8 @@
 #pragma once
 #include <d3d11.h>
 #include "Prerequisites.h"
-
+//https://www.ubisoft.com/en-ca/help/gameplay/article/what-is-vertex-and-pixel-shading/000072849
+//This is Allows us to add special effects to objects in 3D through the pixel data
 class PixelShader
 {
 public:

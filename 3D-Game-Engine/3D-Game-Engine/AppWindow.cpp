@@ -18,7 +18,7 @@ struct constant
 	Matrix4x4 m_world;
 	Matrix4x4 m_view;
 	Matrix4x4 m_proj;
-	unsigned int m_time;
+	unsigned int m_time = 0;
 };
 
 
@@ -28,6 +28,7 @@ AppWindow::AppWindow()
 
 void AppWindow::update()
 {
+	//Updating Time
 	constant cc;
 	cc.m_time = (long)::GetTickCount64();
 
@@ -35,27 +36,9 @@ void AppWindow::update()
 	if (m_delta_pos > 1.0f)
 		m_delta_pos = 0;
 
-
 	Matrix4x4 temp;
 
 	m_delta_scale += m_delta_time / 0.55f;
-
-	//cc.m_world.setScale(Vector3D::lerp(Vector3D(0.5, 0.5, 0), Vector3D(1.0f, 1.0f, 0), (sin(m_delta_scale) + 1.0f) / 2.0f));
-
-	//temp.setTranslation(Vector3D::lerp(Vector3D(-1.5f, -1.5f, 0), Vector3D(1.5f,1.5f, 0), m_delta_pos));
-
-	//cc.m_world *= temp;
-
-	/*cc.m_world.setScale(Vector3D(m_scale_cube, m_scale_cube, m_scale_cube));
-	temp.setIdentity();
-	temp.setRotationZ(0.0f);
-	cc.m_world *= temp;
-	temp.setIdentity();
-	temp.setRotationY(m_rot_y);
-	cc.m_world *= temp;
-	temp.setIdentity();
-	temp.setRotationX(m_rot_x);
-	cc.m_world *= temp;*/
 
 	cc.m_world.setIdentity();
 
@@ -70,36 +53,20 @@ void AppWindow::update()
 	temp.setRotationY(m_rot_y);
 	world_cam *= temp;
 
-
-	Vector3D new_pos = m_world_cam.getTranslation() + world_cam.getZDirection() * (m_forward * 0.02f);
-
-	new_pos = new_pos + world_cam.getXDirection() * (m_rightward * 0.02f);
+	Vector3D new_pos = m_world_cam.getTranslation() + world_cam.getZDirection() * (m_forward * m_camera_speed) + world_cam.getXDirection() * (m_rightward * m_camera_speed);
 
 	world_cam.setTranslation(new_pos);
 
 	m_world_cam = world_cam;
 
-
 	world_cam.inverse();
 
-
-
-
 	cc.m_view = world_cam;
-	/*cc.m_proj.setOrthoLH
-	(
-		(this->getClientWindowRect().right - this->getClientWindowRect().left)/300.0f,
-		(this->getClientWindowRect().bottom - this->getClientWindowRect().top)/300.0f,
-		-4.0f,
-		4.0f
-	);*/
 
 	int width = (this->getClientWindowRect().right - this->getClientWindowRect().left);
 	int height = (this->getClientWindowRect().bottom - this->getClientWindowRect().top);
 
-
 	cc.m_proj.setPerspectiveFovLH(1.57f, ((float)width / (float)height), 0.1f, 100.0f);
-
 
 	m_cb->update(GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext(), &cc);
 }
@@ -116,16 +83,14 @@ void AppWindow::onCreate()
 	InputSystem::get()->addListener(this);
 	InputSystem::get()->showCursor(false);
 
-	//m_wood_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\Assets\\Textures\\brick.png");
-	m_wood_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"A:\\GitHub\\3D-Game-Engine\\3D-Game-Engine\\Assets\\Textures\\brick.png");
+	m_wood_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\asteroid.jpg");
 
-	//m_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\Assets\\Meshes\\torus.obj");
-	m_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"A:\\GitHub\\3D-Game-Engine\\3D-Game-Engine\\Assets\\Meshes\\torus.obj");
+	m_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\asteroid.obj");
 
 	RECT rc = this->getClientWindowRect();
 	m_swap_chain = GraphicsEngine::get()->getRenderSystem()->createSwapChain(this->m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
-	m_world_cam.setTranslation(Vector3D(0, 0, -2));
+	m_world_cam.setTranslation(Vector3D(0, 0, -12));
 
 	void* shader_byte_code = nullptr;
 	size_t size_shader = 0;
@@ -145,48 +110,45 @@ void AppWindow::onCreate()
 
 void AppWindow::onUpdate()
 {
+	//Updates the Window
 	Window::onUpdate();
 
+	//Updates the Input
 	InputSystem::get()->update();
 
-	//CLEAR THE RENDER TARGET 
-	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->clearRenderTargetColor(this->m_swap_chain,
-		0, 0.3f, 0.4f, 1);
-	//SET VIEWPORT OF RENDER TARGET IN WHICH WE HAVE TO DRAW
+	//Clears the Render Target 
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->clearRenderTargetColor(this->m_swap_chain, 0, 0.3f, 0.4f, 1);
+
+	//Sets the Viewport of the Render Target
 	RECT rc = this->getClientWindowRect();
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setViewportSize(rc.right - rc.left, rc.bottom - rc.top);
 
-
-
-
+	//Update Camera Movement
 	update();
 
-
-
-
+	//Sets Constant Buffers for Vertex and Pixel Shaders
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setConstantBuffer(m_vs, m_cb);
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setConstantBuffer(m_ps, m_cb);
 
-	//SET DEFAULT SHADER IN THE GRAPHICS PIPELINE TO BE ABLE TO DRAW
+	//Sets the Shaders
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setVertexShader(m_vs);
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setPixelShader(m_ps);
 
+	//Sets the Txture of the Mesh
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setTexture(m_ps, m_wood_tex);
 
-	//SET THE VERTICES OF THE TRIANGLE TO DRAW
+	//Sets the Vertexs of the Mesh
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setVertexBuffer(m_mesh->getVertexBuffer());
-	//SET THE INDICES OF THE TRIANGLE TO DRAW
+	//Sets the Indices of the Mesh
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setIndexBuffer(m_mesh->getIndexBuffer());
 
-
-	// FINALLY DRAW THE TRIANGLE
+	//Draws the Mesh
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->drawIndexedTriangleList(m_mesh->getIndexBuffer()->getSizeIndexList(), 0, 0);
 	m_swap_chain->present(true);
 
-
+	//Sets the Delta Times
 	m_old_delta = m_new_delta;
 	m_new_delta = (long)::GetTickCount64();
-
 	m_delta_time = (m_old_delta) ? ((m_new_delta - m_old_delta) / 1000.0f) : 0;
 }
 
@@ -197,40 +159,44 @@ void AppWindow::onDestroy()
 
 void AppWindow::onFocus()
 {
+	//Starts Accepting Input
 	InputSystem::get()->addListener(this);
 }
 
 void AppWindow::onKillFocus()
 {
+	//Stops Accepting Input
 	InputSystem::get()->removeListener(this);
 }
 
 void AppWindow::onKeyDown(int key)
 {
+	//Should be a Switch Statement
 	if (key == 'W')
 	{
-		//m_rot_x += 3.14f*m_delta_time;
+		//Forward
 		m_forward = 1.0f;
 	}
 	else if (key == 'S')
 	{
-		//m_rot_x -= 3.14f*m_delta_time;
+		//Backward
 		m_forward = -1.0f;
 	}
 	else if (key == 'A')
 	{
-		//m_rot_y += 3.14f*m_delta_time;
+		//Left
 		m_rightward = -1.0f;
 	}
 	else if (key == 'D')
 	{
-		//m_rot_y -= 3.14f*m_delta_time;
+		//Right
 		m_rightward = 1.0f;
 	}
 }
 
 void AppWindow::onKeyUp(int key)
 {
+	//Resets Direction
 	m_forward = 0.0f;
 	m_rightward = 0.0f;
 }
@@ -240,34 +206,30 @@ void AppWindow::onMouseMove(const Point& mouse_pos)
 	int width = (this->getClientWindowRect().right - this->getClientWindowRect().left);
 	int height = (this->getClientWindowRect().bottom - this->getClientWindowRect().top);
 
-
-
+	//Rotates the Camera by the Delta Mouse Position
 	m_rot_x += (mouse_pos.m_y - (height / 2.0f)) * m_delta_time * 0.1f;
 	m_rot_y += (mouse_pos.m_x - (width / 2.0f)) * m_delta_time * 0.1f;
 
-
-
+	//Sets the cursor to the Middle of the Window
 	InputSystem::get()->setCursorPosition(Point((int)(width / 2.0f), (int)(height / 2.0f)));
-
-
 }
 
 void AppWindow::onLeftMouseDown(const Point& mouse_pos)
 {
-	m_scale_cube = 0.5f;
+	m_camera_speed = 0.025f;
 }
 
 void AppWindow::onLeftMouseUp(const Point& mouse_pos)
 {
-	m_scale_cube = 1.0f;
+	m_camera_speed = 0.05f;
 }
 
 void AppWindow::onRightMouseDown(const Point& mouse_pos)
 {
-	m_scale_cube = 2.0f;
+	m_camera_speed = 0.1f;
 }
 
 void AppWindow::onRightMouseUp(const Point& mouse_pos)
 {
-	m_scale_cube = 1.0f;
+	m_camera_speed = 0.05f;
 }

@@ -2,7 +2,9 @@
 #include "Prerequisites.h"
 #include <exception>
 
+//Singleton
 GraphicsEngine* GraphicsEngine::m_engine = nullptr;
+
 GraphicsEngine::GraphicsEngine()
 {
 	try
@@ -62,7 +64,7 @@ GraphicsEngine::~GraphicsEngine()
 }
 
 
-
+//Singleton Methods that allow useablility
 GraphicsEngine* GraphicsEngine::get()
 {
 	return m_engine;

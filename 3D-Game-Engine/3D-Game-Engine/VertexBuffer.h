@@ -1,7 +1,8 @@
 #pragma once
 #include <d3d11.h>
 #include "Prerequisites.h"
-
+//https://docs.microsoft.com/en-us/windows/win32/direct3d11/overviews-direct3d-11-resources-buffers-vertex-how-to
+//This holds the Vertex Data that will be rendered
 class VertexBuffer
 {
 public:

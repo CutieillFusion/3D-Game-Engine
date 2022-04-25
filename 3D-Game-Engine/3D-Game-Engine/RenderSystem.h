@@ -2,6 +2,8 @@
 #include <d3d11.h>
 #include "Prerequisites.h"
 
+//This is the main Rendering System
+//Mainly Handles the Creation and Storage of Render Components
 class RenderSystem
 {
 public:

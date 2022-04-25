@@ -1,6 +1,7 @@
 #pragma once
 #include "Point.h"
 
+//Listens to Input
 class InputListener
 {
 public:

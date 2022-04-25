@@ -1,7 +1,8 @@
 #pragma once
 #include <d3d11.h>
 #include "Prerequisites.h"
-
+//https://docs.microsoft.com/en-us/windows/win32/direct3d9/what-is-a-swap-chain-
+//This is abunch of virtual framebuffers utilized by the graphics card for frame rate and someother stuff
 class SwapChain
 {
 public:

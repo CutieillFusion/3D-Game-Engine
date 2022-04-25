@@ -24,15 +24,13 @@ cbuffer constant: register(b0)
 
 VS_OUTPUT vsmain(VS_INPUT input)
 {
-	VS_OUTPUT output = (VS_OUTPUT)0;
+	VS_OUTPUT output = (VS_OUTPUT)0;//Initializes Output
 
-	//output.position = lerp(input.position, input.position1, (sin(m_angle) + 1.0f) / 2.0f);
-
-	//world space
+	//Converts to World Space
 	output.position = mul(input.position, m_world);
-	//view space
+	//Convertes to View Space
 	output.position = mul(output.position, m_view);
-	//screen space
+	//Converts to Screen Space
 	output.position = mul(output.position, m_proj);
 
 

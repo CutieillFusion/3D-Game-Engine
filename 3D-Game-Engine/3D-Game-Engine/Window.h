@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 
+//This is the Actual Window and the Game Loop but the Game Loop could be offset into a constant buffer timer or something similar
 class Window
 {
 public:

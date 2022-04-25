@@ -4,6 +4,7 @@
 #include "Prerequisites.h"
 #include "Resource.h"
 
+//Base class of all the Resource's Managers
 class ResourceManager
 {
 public:
@@ -14,5 +15,5 @@ public:
 protected:
 	virtual Resource* createResourceFromFileConcrete(const wchar_t* file_path) = 0;
 private:
-	std::unordered_map<std::wstring, ResourcePtr> m_map_resources;
+	std::unordered_map<std::wstring, ResourcePtr> m_map_resources;//Holds a list of the reosurces with path as the index
 };

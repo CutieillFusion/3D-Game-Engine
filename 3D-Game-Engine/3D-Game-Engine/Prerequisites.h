@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 
+//This holds creation and referencing for shared pointers
+
 class SwapChain;
 class DeviceContext;
 class VertexBuffer;

@@ -14,18 +14,19 @@ InputSystem::~InputSystem()
 
 void InputSystem::update()
 {
+	//Gets Mouse Pos
 	POINT current_mouse_pos = {};
 	::GetCursorPos(&current_mouse_pos);
 
-	if (m_first_time)
+	if (m_first_time)//Stops Annoying Bug 
 	{
 		m_old_mouse_pos = Point(current_mouse_pos.x, current_mouse_pos.y);
 		m_first_time = false;
 	}
 
+	//Checks if the mouse has Moved
 	if (current_mouse_pos.x != m_old_mouse_pos.m_x || current_mouse_pos.y != m_old_mouse_pos.m_y)
 	{
-		//THERE IS MOUSE MOVE EVENT
 		std::unordered_set<InputListener*>::iterator it = m_set_listeners.begin();
 
 		while (it != m_set_listeners.end())
@@ -34,29 +35,30 @@ void InputSystem::update()
 			++it;
 		}
 	}
-	m_old_mouse_pos = Point(current_mouse_pos.x, current_mouse_pos.y);
+	m_old_mouse_pos = Point(current_mouse_pos.x, current_mouse_pos.y);//Sets the Old Position to Current Position
 
 
-
+	//Gets Keyboard State
 	if (::GetKeyboardState(m_keys_state))
 	{
-		for (unsigned int i = 0; i < 256; i++)
+		for (unsigned int i = 0; i < 256; i++)//Runs through all Keys
 		{
-			// KEY IS DOWN
-			if (m_keys_state[i] & 0x80)
+			//Key is Down
+			if (m_keys_state[i] & 0x80)//Bit Masking Technique
 			{
 				std::unordered_set<InputListener*>::iterator it = m_set_listeners.begin();
 
-				while (it != m_set_listeners.end())
+				while (it != m_set_listeners.end())//Loops through listeners
 				{
-					if (i == VK_LBUTTON)
+					//This should probably be a switch statement instead
+					if (i == VK_LBUTTON)//Left Mouse Button Down
 					{
 						if (m_keys_state[i] != m_old_keys_state[i])
 						{
 							(*it)->onLeftMouseDown(Point(current_mouse_pos.x, current_mouse_pos.y));
 						}
 					}
-					else if (i == VK_RBUTTON)
+					else if (i == VK_RBUTTON)//Rght Mouse Button Down
 					{
 						if (m_keys_state[i] != m_old_keys_state[i])
 						{
@@ -70,19 +72,21 @@ void InputSystem::update()
 					++it;
 				}
 			}
-			else // KEY IS UP
+			else//Key is Up
 			{
-				if (m_keys_state[i] != m_old_keys_state[i])
+				if (m_keys_state[i] != m_old_keys_state[i])//Checks if old state is different from current state
 				{
 					std::unordered_set<InputListener*>::iterator it = m_set_listeners.begin();
 
-					while (it != m_set_listeners.end())
+
+					while (it != m_set_listeners.end())//Loops through listeners
 					{
-						if (i == VK_LBUTTON)
+						//This should probably be a switch statement instead
+						if (i == VK_LBUTTON)//Left Mouse Button Up
 						{
 							(*it)->onLeftMouseUp(Point(current_mouse_pos.x, current_mouse_pos.y));
 						}
-						else if (i == VK_RBUTTON)
+						else if (i == VK_RBUTTON)//Right Mouse Button up
 						{
 							(*it)->onRightMouseUp(Point(current_mouse_pos.x, current_mouse_pos.y));
 						}
@@ -96,7 +100,7 @@ void InputSystem::update()
 				}
 			}
 		}
-		// store current keys state to old keys state buffer
+		//Stores Current Key State to Old Key State
 		::memcpy(m_old_keys_state, m_keys_state, sizeof(unsigned char) * 256);
 	}
 }
@@ -121,6 +125,7 @@ void InputSystem::showCursor(bool show)
 	::ShowCursor(show);
 }
 
+//Singleton Methods that allow useablility
 InputSystem* InputSystem::get()
 {
 	return m_system;

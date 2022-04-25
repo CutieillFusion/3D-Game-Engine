@@ -1,17 +1,14 @@
 #include "Window.h"
 #include <exception>
-//Window* window=nullptr;
+
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	//GetWindowLong(hwnd,)
 	switch (msg)
 	{
 	case WM_CREATE:
 	{
 		// Event fired when the window is created
-		// collected here..
-
 		break;
 	}
 
@@ -51,7 +48,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 Window::Window()
 {
-
 	//Setting up WNDCLASSEX object
 	WNDCLASSEX wc;
 	wc.cbClsExtra = NULL;
@@ -67,45 +63,37 @@ Window::Window()
 	wc.style = NULL;
 	wc.lpfnWndProc = &WndProc;
 
-	if (!::RegisterClassEx(&wc)) // If the registration of class will fail, the function will return false
+	//Failure Check
+	if (!::RegisterClassEx(&wc))
 	{
 		throw std::exception("Window not successfully created");
 	}
 
-	/*if (!window)
-		window = this;*/
+	//Creates the Window
+	m_hwnd = ::CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"MyWindowClass", L"3D Game Engine", WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, NULL, NULL);
 
-		//Creation of the window
-	m_hwnd = ::CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"MyWindowClass", L"3D Game Engine",
-		WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768,
-		NULL, NULL, NULL, NULL);
-
-	//if the creation fail return false
 	if (!m_hwnd)
 	{
 		throw std::exception("Window not successfully created");
 	}
 
-	//show up the window
+	//Show the Window
 	::ShowWindow(m_hwnd, SW_SHOW);
 	::UpdateWindow(m_hwnd);
 
-
-
-
-	//set this flag to true to indicate that the window is initialized and running
+	//Set this flag to true to indicate that the Window is Initialized and Running
 	m_is_run = true;
 
 }
 
 
 
-
+//This is the Update Loop
 bool Window::broadcast()
 {
 	MSG msg;
 
-	if (!this->m_is_init)
+	if (!this->m_is_init)//Initializes the Window
 	{
 		SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
 		this->onCreate();
@@ -120,6 +108,7 @@ bool Window::broadcast()
 		DispatchMessage(&msg);
 	}
 
+	//Need to give some Time between Updates
 	Sleep(1);
 
 	return true;

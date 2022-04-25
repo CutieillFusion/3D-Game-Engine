@@ -31,10 +31,13 @@ RenderSystem::RenderSystem()
 	{
 		res = D3D11CreateDevice(NULL, driver_types[driver_type_index], NULL, NULL, feature_levels,
 			num_feature_levels, D3D11_SDK_VERSION, &m_d3d_device, &m_feature_level, &m_imm_context);
-		if (SUCCEEDED(res))
+		if (SUCCEEDED(res)) 
+		{
 			break;
+		}
 		++driver_type_index;
 	}
+
 	if (FAILED(res))
 	{
 		throw std::exception("RenderSystem not successfully created");

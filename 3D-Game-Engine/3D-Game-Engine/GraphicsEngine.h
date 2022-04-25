@@ -4,6 +4,7 @@
 #include "RenderSystem.h"
 #include "TextureManager.h"
 #include "MeshManager.h"
+//This is Holds references to anything that involves graphics
 class GraphicsEngine
 {
 private:
@@ -14,7 +15,7 @@ public:
 	TextureManager* getTextureManager();
 	MeshManager* getMeshManager();
 	void getVertexMeshLayoutShaderByteCodeAndSize(void** byte_code, size_t* size);
-public:
+public://Singleton Behavior
 	static GraphicsEngine* get();
 	static void create();
 	static void release();

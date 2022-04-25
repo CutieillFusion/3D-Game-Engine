@@ -1,6 +1,7 @@
 #include "AppWindow.h"
 #include "InputSystem.h"
 
+//Entry Point of the Entire Program
 int main()
 {
 	try

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+//Base Class of all Resources
 class Resource
 {
 public:

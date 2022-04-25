@@ -10,7 +10,7 @@ struct VS_OUTPUT
 	float2 texcoord : TEXCOORD0;
 };
 
-
+//This Shader is only for getting the Mesh Data
 VS_OUTPUT vsmain(VS_INPUT input)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
