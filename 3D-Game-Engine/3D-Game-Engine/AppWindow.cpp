@@ -18,7 +18,8 @@ struct constant
 	Matrix4x4 m_world;
 	Matrix4x4 m_view;
 	Matrix4x4 m_proj;
-	unsigned int m_time = 0;
+	Vector4D m_light_direction;
+	Vector4D m_camera_position;
 };
 
 
@@ -30,13 +31,20 @@ void AppWindow::update()
 {
 	//Updating Time
 	constant cc;
-	cc.m_time = (long)::GetTickCount64();
+	//cc.m_time = (long)::GetTickCount64();
 
 	m_delta_pos += m_delta_time / 10.0f;
 	if (m_delta_pos > 1.0f)
 		m_delta_pos = 0;
 
 	Matrix4x4 temp;
+	Matrix4x4 m_light_rot_matrix;
+	m_light_rot_matrix.setIdentity();
+	m_light_rot_matrix.setRotationY(m_light_rot_y);
+
+	m_light_rot_y += 0.707f / 4 * m_delta_time;
+
+	cc.m_light_direction = m_light_rot_matrix.getZDirection();
 
 	m_delta_scale += m_delta_time / 0.55f;
 
@@ -56,6 +64,8 @@ void AppWindow::update()
 	Vector3D new_pos = m_world_cam.getTranslation() + world_cam.getZDirection() * (m_forward * m_camera_speed) + world_cam.getXDirection() * (m_rightward * m_camera_speed);
 
 	world_cam.setTranslation(new_pos);
+
+	cc.m_camera_position = new_pos;
 
 	m_world_cam = world_cam;
 
@@ -85,12 +95,12 @@ void AppWindow::onCreate()
 
 	m_wood_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\asteroid.jpg");
 
-	m_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\asteroid.obj");
+	m_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\statue.obj");
 
 	RECT rc = this->getClientWindowRect();
 	m_swap_chain = GraphicsEngine::get()->getRenderSystem()->createSwapChain(this->m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
-	m_world_cam.setTranslation(Vector3D(0, 0, -12));
+	m_world_cam.setTranslation(Vector3D(0, 0, -2));
 
 	void* shader_byte_code = nullptr;
 	size_t size_shader = 0;
@@ -103,7 +113,7 @@ void AppWindow::onCreate()
 	GraphicsEngine::get()->getRenderSystem()->releaseCompiledShader();
 
 	constant cc;
-	cc.m_time = 0;
+	//cc.m_time = 0;
 
 	m_cb = GraphicsEngine::get()->getRenderSystem()->createConstantBuffer(&cc, sizeof(constant));
 }
@@ -216,20 +226,20 @@ void AppWindow::onMouseMove(const Point& mouse_pos)
 
 void AppWindow::onLeftMouseDown(const Point& mouse_pos)
 {
-	m_camera_speed = 0.025f;
+	m_camera_speed = 0.04f;
 }
 
 void AppWindow::onLeftMouseUp(const Point& mouse_pos)
 {
-	m_camera_speed = 0.05f;
+	m_camera_speed = 0.02f;
 }
 
 void AppWindow::onRightMouseDown(const Point& mouse_pos)
 {
-	m_camera_speed = 0.1f;
+	m_camera_speed = 0.01f;
 }
 
 void AppWindow::onRightMouseUp(const Point& mouse_pos)
 {
-	m_camera_speed = 0.05f;
+	m_camera_speed = 0.02f;
 }

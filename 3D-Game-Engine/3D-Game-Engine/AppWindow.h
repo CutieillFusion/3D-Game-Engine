@@ -57,9 +57,11 @@ private:
 	float m_rot_x = 0.0f;
 	float m_rot_y = 0.0f;
 
+	float m_light_rot_y = 0.0f;
+
 	float m_scale_cube = 1;
 	float m_forward = 0.0f;
 	float m_rightward = 0.0f;
 	Matrix4x4 m_world_cam;
-	float m_camera_speed = 0.05f;
+	float m_camera_speed = 0.02f;
 };
