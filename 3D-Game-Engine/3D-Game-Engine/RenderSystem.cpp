@@ -48,6 +48,8 @@ RenderSystem::RenderSystem()
 	m_d3d_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&m_dxgi_device);
 	m_dxgi_device->GetParent(__uuidof(IDXGIAdapter), (void**)&m_dxgi_adapter);
 	m_dxgi_adapter->GetParent(__uuidof(IDXGIFactory), (void**)&m_dxgi_factory);
+
+	initRasterizerState();
 }
 
 
@@ -112,6 +114,31 @@ bool RenderSystem::releaseCompiledShader()
 		m_blob->Release();
 	}
 	return true;
+}
+
+void RenderSystem::setRasterizeState(bool cull_front)
+{
+	if (cull_front) 
+	{
+		m_imm_context->RSSetState(m_cull_front_state);
+	}
+	else
+	{
+		m_imm_context->RSSetState(m_cull_back_state);
+	}
+}
+
+void RenderSystem::initRasterizerState()
+{
+	D3D11_RASTERIZER_DESC desc = {};
+	desc.CullMode = D3D11_CULL_FRONT;
+	desc.DepthClipEnable = true;
+	desc.FillMode = D3D11_FILL_SOLID;
+
+	m_d3d_device->CreateRasterizerState(&desc, &m_cull_front_state);
+
+	desc.CullMode = D3D11_CULL_BACK;
+	m_d3d_device->CreateRasterizerState(&desc, &m_cull_back_state);
 }
 
 SwapChainPtr RenderSystem::createSwapChain(HWND hwnd, UINT width, UINT height)
