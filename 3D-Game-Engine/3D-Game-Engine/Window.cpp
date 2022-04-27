@@ -11,7 +11,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		// Event fired when the window is created
 		break;
 	}
-
+	case WM_SIZE:
+	{
+		// Event fired when the window is resized
+		Window* window = (Window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (window)
+		{
+			window->onSize();
+		}
+		break;
+	}
 	case WM_DESTROY:
 	{
 		// Event fired when the window is destroyed
@@ -70,7 +79,7 @@ Window::Window()
 	}
 
 	//Creates the Window
-	m_hwnd = ::CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"MyWindowClass", L"3D Game Engine", WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, NULL, NULL);
+	m_hwnd = ::CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"MyWindowClass", L"3D Game Engine", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, NULL, NULL);
 
 	if (!m_hwnd)
 	{
@@ -130,6 +139,16 @@ RECT Window::getClientWindowRect()
 	return rc;
 }
 
+RECT Window::getSizeScreen()
+{
+	RECT rc;
+
+	rc.right = ::GetSystemMetrics(SM_CXSCREEN);
+	rc.bottom = ::GetSystemMetrics(SM_CYSCREEN);
+	
+	return rc;
+}
+
 void Window::onCreate()
 {
 }
@@ -148,6 +167,10 @@ void Window::onFocus()
 }
 
 void Window::onKillFocus()
+{
+}
+
+void Window::onSize()
 {
 }
 

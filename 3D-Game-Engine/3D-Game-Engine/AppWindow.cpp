@@ -28,6 +28,33 @@ AppWindow::AppWindow()
 {
 }
 
+void AppWindow::render()
+{
+	//Clears the Render Target 
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->clearRenderTargetColor(this->m_swap_chain, 0, 0.3f, 0.4f, 1);
+
+	//Sets the Viewport of the Render Target
+	RECT rc = this->getClientWindowRect();
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setViewportSize(rc.right - rc.left, rc.bottom - rc.top);
+
+	//Update Transform Matrices
+	update();
+
+	//Render Model
+	GraphicsEngine::get()->getRenderSystem()->setRasterizeState(false);
+	drawMesh(m_mesh, m_vs, m_ps, m_cb, m_wood_tex);
+	//Draws Skybox
+	GraphicsEngine::get()->getRenderSystem()->setRasterizeState(true);
+	drawMesh(m_sky_mesh, m_vs, m_sky_ps, m_sky_cb, m_sky_tex);
+
+	m_swap_chain->present(true);
+
+	//Sets the Delta Times
+	m_old_delta = m_new_delta;
+	m_new_delta = (long)::GetTickCount64();
+	m_delta_time = (m_old_delta) ? ((m_new_delta - m_old_delta) / 1000.0f) : 0;
+}
+
 void AppWindow::update()
 {
 	updateCamera();//This must happen first because transformation depends on camera matrix
@@ -129,6 +156,8 @@ void AppWindow::onCreate()
 	Window::onCreate();
 
 	InputSystem::get()->addListener(this);
+
+	m_play_state = true;
 	InputSystem::get()->showCursor(false);
 
 	m_wood_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\brick.png");
@@ -170,34 +199,13 @@ void AppWindow::onUpdate()
 	//Updates the Input
 	InputSystem::get()->update();
 
-	//Clears the Render Target 
-	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->clearRenderTargetColor(this->m_swap_chain, 0, 0.3f, 0.4f, 1);
-
-	//Sets the Viewport of the Render Target
-	RECT rc = this->getClientWindowRect();
-	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setViewportSize(rc.right - rc.left, rc.bottom - rc.top);
-
-	//Update Transform Matrices
-	update();
-
-	//Render Model
-	GraphicsEngine::get()->getRenderSystem()->setRasterizeState(false);
-	drawMesh(m_mesh, m_vs, m_ps, m_cb, m_wood_tex);
-	//Draws Skybox
-	GraphicsEngine::get()->getRenderSystem()->setRasterizeState(true);
-	drawMesh(m_sky_mesh, m_vs, m_sky_ps, m_sky_cb, m_sky_tex);
-
-	m_swap_chain->present(true);
-
-	//Sets the Delta Times
-	m_old_delta = m_new_delta;
-	m_new_delta = (long)::GetTickCount64();
-	m_delta_time = (m_old_delta) ? ((m_new_delta - m_old_delta) / 1000.0f) : 0;
+	this->render();
 }
 
 void AppWindow::onDestroy()
 {
 	Window::onDestroy();
+	m_swap_chain->setFullScreen(false, 1, 1);
 }
 
 void AppWindow::onFocus()
@@ -210,6 +218,13 @@ void AppWindow::onKillFocus()
 {
 	//Stops Accepting Input
 	InputSystem::get()->removeListener(this);
+}
+
+void AppWindow::onSize()
+{
+	RECT rc = this->getClientWindowRect();
+	m_swap_chain->resize(rc.right, rc.bottom);
+	this->render();
 }
 
 void AppWindow::onKeyDown(int key)
@@ -242,10 +257,28 @@ void AppWindow::onKeyUp(int key)
 	//Resets Direction
 	m_forward = 0.0f;
 	m_rightward = 0.0f;
+
+	if (key == 'G') 
+	{
+		m_play_state = m_play_state ? false : true;
+		InputSystem::get()->showCursor(!m_play_state);
+	}
+	else if (key == 'F')
+	{
+		m_fullscreen_state = m_fullscreen_state ? false : true;
+		RECT size_screen = this->getSizeScreen();
+
+		m_swap_chain->setFullScreen(m_fullscreen_state, size_screen.right, size_screen.bottom);
+	}
 }
 
 void AppWindow::onMouseMove(const Point& mouse_pos)
 {
+	if (!m_play_state) 
+	{
+		return;
+	}
+
 	int width = (this->getClientWindowRect().right - this->getClientWindowRect().left);
 	int height = (this->getClientWindowRect().bottom - this->getClientWindowRect().top);
 

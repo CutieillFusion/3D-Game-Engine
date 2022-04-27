@@ -24,6 +24,7 @@ public:
 	virtual void onDestroy() override;
 	virtual void onFocus() override;
 	virtual void onKillFocus() override;
+	virtual void onSize() override;
 
 	// Inherited via InputListener
 	virtual void onKeyDown(int key) override;
@@ -36,6 +37,7 @@ public:
 	virtual void onRightMouseUp(const Point& mouse_pos) override;
 
 public:
+	void render();
 	void update();
 	void updateModel();
 	void updateCamera();
@@ -74,4 +76,7 @@ private:
 	Matrix4x4 m_world_cam;
 	Matrix4x4 m_view_cam;
 	Matrix4x4 m_proj_cam;
+
+	bool m_play_state = false;
+	bool m_fullscreen_state = false;
 };
