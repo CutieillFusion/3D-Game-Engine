@@ -21,6 +21,8 @@ struct constant
 	Matrix4x4 m_proj;
 	Vector4D m_light_direction;
 	Vector4D m_camera_position;
+	Vector4D m_light_position = Vector4D(0, 1, 0, 0);
+	float m_light_radius = 4.0f;
 	float m_time = 0.0f;
 };
 
@@ -44,13 +46,10 @@ void AppWindow::render()
 	//Render Model
 	GraphicsEngine::get()->getRenderSystem()->setRasterizeState(false);
 
-	TexturePtr list_tex[4];
-	list_tex[0] = m_earth_color_tex;
-	list_tex[1] = m_earth_spec_tex;
-	list_tex[2] = m_clouds_tex;
-	list_tex[3] = m_earth_night_tex;
+	TexturePtr list_tex[1];
+	list_tex[0] = m_wall_tex;
 
-	drawMesh(m_mesh, m_vs, m_ps, m_cb, list_tex, 4);
+	drawMesh(m_mesh, m_vs, m_ps, m_cb, list_tex, 1);
 
 	//Draws Skybox
 	GraphicsEngine::get()->getRenderSystem()->setRasterizeState(true);
@@ -88,6 +87,12 @@ void AppWindow::updateModel()
 	cc.m_view = m_view_cam;
 	cc.m_proj = m_proj_cam;
 	cc.m_camera_position = m_world_cam.getTranslation();
+
+	float dist_from_origin = 1.0f;
+
+	cc.m_light_position = Vector4D(cos(m_light_rot_y * 4) * dist_from_origin, 1.0f, sin(m_light_rot_y * 4), 1.0f);
+
+	cc.m_light_radius = m_light_radius;
 	cc.m_light_direction = m_light_rot_matrix.getZDirection();
 	cc.m_time = m_time;
 
@@ -173,15 +178,12 @@ void AppWindow::onCreate()
 	m_play_state = true;
 	InputSystem::get()->showCursor(false);
 
-	m_earth_color_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\earth_color.jpg");
-	m_earth_spec_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\earth_spec.jpg");
-	m_clouds_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\clouds.jpg");
-	m_earth_night_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\earth_night.jpg");
+	m_wall_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\wall.jpg");
 
 
 	m_sky_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\stars_map.jpg");
 	
-	m_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\sphere_hq.obj");
+	m_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\scene.obj");
 	m_sky_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\sphere.obj");
 
 	RECT rc = this->getClientWindowRect();
@@ -191,11 +193,11 @@ void AppWindow::onCreate()
 
 	void* shader_byte_code = nullptr;
 	size_t size_shader = 0;
-	GraphicsEngine::get()->getRenderSystem()->compileVertexShader(L"VertexShader.hlsl", "vsmain", &shader_byte_code, &size_shader);
+	GraphicsEngine::get()->getRenderSystem()->compileVertexShader(L"PointLightVertexShader.hlsl", "vsmain", &shader_byte_code, &size_shader);
 	m_vs = GraphicsEngine::get()->getRenderSystem()->createVertexShader(shader_byte_code, size_shader);
 	GraphicsEngine::get()->getRenderSystem()->releaseCompiledShader();
 
-	GraphicsEngine::get()->getRenderSystem()->compilePixelShader(L"PixelShader.hlsl", "psmain", &shader_byte_code, &size_shader);
+	GraphicsEngine::get()->getRenderSystem()->compilePixelShader(L"PointLightPixelShader.hlsl", "psmain", &shader_byte_code, &size_shader);
 	m_ps = GraphicsEngine::get()->getRenderSystem()->createPixelShader(shader_byte_code, size_shader);
 	GraphicsEngine::get()->getRenderSystem()->releaseCompiledShader();
 
@@ -267,6 +269,16 @@ void AppWindow::onKeyDown(int key)
 	{
 		//Right
 		m_rightward = 1.0f;
+	}
+	else if (key == 'O')
+	{
+		//Decrease Radius
+		m_light_radius -= 1.0f * m_delta_time;
+	}
+	else if (key == 'P')
+	{
+		//Increase Radius
+		m_light_radius += 1.0f * m_delta_time;
 	}
 }
 
