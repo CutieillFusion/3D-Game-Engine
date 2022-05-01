@@ -14,6 +14,11 @@ Texture::Texture(const wchar_t* full_path) : Resource(full_path)
 		//Creats Texture
 		res = DirectX::CreateTexture(GraphicsEngine::get()->getRenderSystem()->m_d3d_device, image_data.GetImages(), image_data.GetImageCount(), image_data.GetMetadata(), &m_texture);
 
+		if (FAILED(res)) 
+		{
+			throw std::exception("Texture not created successfully");
+		}
+
 		//Shader Resource Description
 		D3D11_SHADER_RESOURCE_VIEW_DESC desc = {};
 		desc.Format = image_data.GetMetadata().format;
@@ -21,8 +26,30 @@ Texture::Texture(const wchar_t* full_path) : Resource(full_path)
 		desc.Texture2D.MipLevels = image_data.GetMetadata().mipLevels;
 		desc.Texture2D.MostDetailedMip = 0;
 
+		//Sampler State Description 
+		D3D11_SAMPLER_DESC sampler_desc = {};
+		sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampler_desc.Filter = D3D11_FILTER_ANISOTROPIC;
+		sampler_desc.MinLOD = 0;
+		sampler_desc.MaxLOD = (UINT)image_data.GetMetadata().mipLevels;
+
+		//Creates Sampler State Object
+		res = GraphicsEngine::get()->getRenderSystem()->m_d3d_device->CreateSamplerState(&sampler_desc, &m_sampler_state);
+		
+		if (FAILED(res))
+		{
+			throw std::exception("Texture not created successfully");
+		}
+
 		//Creates Shader Resource View
-		GraphicsEngine::get()->getRenderSystem()->m_d3d_device->CreateShaderResourceView(m_texture, &desc, &m_shader_res_view);
+		res = GraphicsEngine::get()->getRenderSystem()->m_d3d_device->CreateShaderResourceView(m_texture, &desc, &m_shader_res_view);
+
+		if (FAILED(res))
+		{
+			throw std::exception("Texture not created successfully");
+		}
 	}
 	else
 	{
