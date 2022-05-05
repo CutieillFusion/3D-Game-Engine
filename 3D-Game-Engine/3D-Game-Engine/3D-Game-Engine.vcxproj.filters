@@ -82,6 +82,9 @@
     <ClInclude Include="tiny_obj_loader.h">
       <Filter>ExternalClasses</Filter>
     </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>GameEngine\GraphicsEngine\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -140,6 +143,9 @@
     </ClCompile>
     <ClCompile Include="InputSystem.cpp">
       <Filter>GameEngine\InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>GameEngine\GraphicsEngine\Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +228,9 @@
     </Filter>
     <Filter Include="App\Shaders\PointLightShader">
       <UniqueIdentifier>{c345ea9e-f46f-4bbf-8413-f7d68080088e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameEngine\GraphicsEngine\Material">
+      <UniqueIdentifier>{c5e5711b-7c68-4d97-bc83-34c6723cdad6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

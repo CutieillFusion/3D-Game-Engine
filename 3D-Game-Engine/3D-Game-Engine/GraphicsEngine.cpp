@@ -1,7 +1,7 @@
 #include "GraphicsEngine.h"
 #include "Prerequisites.h"
 #include <exception>
-
+#include "DeviceContext.h"
 //Singleton
 GraphicsEngine* GraphicsEngine::m_engine = nullptr;
 
@@ -47,6 +47,35 @@ TextureManager* GraphicsEngine::getTextureManager()
 MeshManager* GraphicsEngine::getMeshManager()
 {
 	return m_mesh_manager;
+}
+
+MaterialPtr GraphicsEngine::createMaterial(const wchar_t* vertex_shader_path, const wchar_t* pixel_shader_path)
+{
+	MaterialPtr mat = nullptr;
+
+	try
+	{
+		mat = std::make_shared<Material>(vertex_shader_path, pixel_shader_path);
+	}
+	catch (...) {}
+	return mat;
+}
+
+void GraphicsEngine::setMaterial(const MaterialPtr& material)
+{
+	//Sets Cull Mode
+	GraphicsEngine::get()->getRenderSystem()->setRasterizeState((material->m_cull_mode == CULL_MODE_FRONT));
+
+	//Sets Constant Buffers for Vertex and Pixel Shaders
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setConstantBuffer(material->m_vertex_shader, material->m_constant_buffer);
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setConstantBuffer(material->m_pixel_shader, material->m_constant_buffer);
+
+	//Sets the Shaders
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setVertexShader(material->m_vertex_shader);
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setPixelShader(material->m_pixel_shader);
+
+	//Sets the Texture of the Mesh
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setTexture(material->m_pixel_shader, &material->m_vec_textures[0], material->m_vec_textures.size());
 }
 
 void GraphicsEngine::getVertexMeshLayoutShaderByteCodeAndSize(void** byte_code, size_t* size)
