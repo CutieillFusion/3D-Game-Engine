@@ -26,7 +26,6 @@ struct constant
 	float m_time = 0.0f;
 };
 
-//Current Stuck @ 27:59 Ep 24 
 AppWindow::AppWindow()
 {
 }
@@ -43,8 +42,21 @@ void AppWindow::render()
 	//Update Transform Matrices
 	update();
 
-	//Render Model
-	drawMesh(m_mesh, m_mat);
+	for (int i = 0; i < 3; i++) 
+	{
+		//Render Model
+		updateModel(Vector3D(0, 2, -4 + 4 * i), m_mat);
+		drawMesh(m_torus_mesh, m_mat);
+
+		updateModel(Vector3D(4, 2, -4 + 4 * i), m_earth_mat);
+		drawMesh(m_sky_mesh, m_earth_mat);
+
+		updateModel(Vector3D(-4, 2, -4 + 4 * i), m_bricks_mat);
+		drawMesh(m_suzanne_mesh, m_bricks_mat);
+	}
+
+	updateModel(Vector3D(0, 0, 0), m_mat);
+	drawMesh(m_plane_mesh, m_mat);
 
 	//Draws Skybox
 	drawMesh(m_sky_mesh, m_sky_mat);
@@ -61,11 +73,11 @@ void AppWindow::render()
 void AppWindow::update()
 {
 	updateCamera();//This must happen first because transformation depends on camera matrix
-	updateModel();
+	updateLight();
 	updateSkyBox();
 }
 
-void AppWindow::updateModel()
+void AppWindow::updateModel(Vector3D position, const MaterialPtr& material)
 {
 	constant cc;
 
@@ -73,22 +85,18 @@ void AppWindow::updateModel()
 	m_light_rot_matrix.setIdentity();
 	m_light_rot_matrix.setRotationY(m_light_rot_y);
 
-	m_light_rot_y += (0.707f / 2) * m_delta_time;
-
 	cc.m_world.setIdentity();
+	cc.m_world.setTranslation(position);
 	cc.m_view = m_view_cam;
 	cc.m_proj = m_proj_cam;
 	cc.m_camera_position = m_world_cam.getTranslation();
 
-	float dist_from_origin = 1.0f;
-
-	cc.m_light_position = Vector4D(cos(m_light_rot_y * 4) * dist_from_origin, 1.0f, sin(m_light_rot_y * 4), 1.0f);
-
+	cc.m_light_position = m_light_position;
 	cc.m_light_radius = m_light_radius;
 	cc.m_light_direction = m_light_rot_matrix.getZDirection();
 	cc.m_time = m_time;
 
-	m_mat->setData(&cc, sizeof(constant));
+	material->setData(&cc, sizeof(constant));
 }
 
 void AppWindow::updateCamera()
@@ -146,6 +154,16 @@ void AppWindow::drawMesh(const MeshPtr& mesh, const MaterialPtr& material)
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->drawIndexedTriangleList(mesh->getIndexBuffer()->getSizeIndexList(), 0, 0);
 }
 
+void AppWindow::updateLight()
+{
+	m_light_rot_y += 0.707f  * 2 * m_delta_time;
+
+	float dist_from_origin = 3.0f;
+
+	m_light_position = Vector4D(cos(m_light_rot_y) * dist_from_origin, 2.0f, sin(m_light_rot_y) * dist_from_origin, 1.0f);
+
+}
+
 
 AppWindow::~AppWindow()
 {
@@ -161,11 +179,18 @@ void AppWindow::onCreate()
 	InputSystem::get()->showCursor(false);
 
 	m_wall_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\wall.jpg");
+	m_bricks_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\brick.png");
+	m_earth_color_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\earth_color.jpg");
 
 
 	m_sky_tex = GraphicsEngine::get()->getTextureManager()->createTextureFromFile(L"..\\3D-Game-Engine\\Assets\\Textures\\stars_map.jpg");
 	
 	m_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\scene.obj");
+	m_torus_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\torus.obj");
+	m_suzanne_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\suzanne.obj");
+	m_plane_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\plane.obj");
+
+
 	m_sky_mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(L"..\\3D-Game-Engine\\Assets\\Meshes\\sphere.obj");
 
 	RECT rc = this->getClientWindowRect();
@@ -175,17 +200,20 @@ void AppWindow::onCreate()
 
 
 	m_mat = GraphicsEngine::get()->createMaterial(L"PointLightVertexShader.hlsl", L"PointLightPixelShader.hlsl");
-	std::cout << "1";
 	m_mat->addTexture(m_wall_tex);
-	std::cout << "2";
 	m_mat->setCullMode(CULL_MODE_BACK);
-	std::cout << "3";
 
+	m_earth_mat = GraphicsEngine::get()->createMaterial(m_mat);
+	m_earth_mat->addTexture(m_earth_color_tex);
+	m_earth_mat->setCullMode(CULL_MODE_BACK);
 
+	m_bricks_mat = GraphicsEngine::get()->createMaterial(m_mat);
+	m_bricks_mat->addTexture(m_bricks_tex);
+	m_bricks_mat->setCullMode(CULL_MODE_BACK);
 
 	m_sky_mat = GraphicsEngine::get()->createMaterial(L"PointLightVertexShader.hlsl", L"SkyBoxShader.hlsl");
 	m_sky_mat->addTexture(m_sky_tex);
-	m_mat->setCullMode(CULL_MODE_FRONT);
+	m_sky_mat->setCullMode(CULL_MODE_FRONT);
 }
 
 void AppWindow::onUpdate()

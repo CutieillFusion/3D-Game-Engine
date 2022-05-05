@@ -17,6 +17,7 @@ class Material
 {
 public:
 	Material(const wchar_t* vertex_shader_path, const wchar_t* pixel_shader_path);
+	Material(const MaterialPtr& material); 
 	~Material();
 
 	void addTexture(const TexturePtr& texture);
@@ -31,7 +32,7 @@ private:
 	PixelShaderPtr m_pixel_shader;
 	ConstantBufferPtr m_constant_buffer;
 	std::vector<TexturePtr> m_vec_textures;
-	CULL_MODE m_cull_mode = CULL_MODE_BACK;
+	CULL_MODE m_cull_mode = CULL_MODE_FRONT;
 	friend class GraphicsEngine;
 };
 

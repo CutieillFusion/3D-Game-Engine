@@ -61,6 +61,18 @@ MaterialPtr GraphicsEngine::createMaterial(const wchar_t* vertex_shader_path, co
 	return mat;
 }
 
+MaterialPtr GraphicsEngine::createMaterial(const MaterialPtr& material)
+{
+	MaterialPtr mat = nullptr;
+
+	try
+	{
+		mat = std::make_shared<Material>(material);
+	}
+	catch (...) {}
+	return mat;
+}
+
 void GraphicsEngine::setMaterial(const MaterialPtr& material)
 {
 	//Sets Cull Mode

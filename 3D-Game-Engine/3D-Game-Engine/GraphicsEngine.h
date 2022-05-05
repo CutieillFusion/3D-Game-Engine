@@ -17,6 +17,7 @@ public:
 	MeshManager* getMeshManager();
 public:
 	MaterialPtr createMaterial(const wchar_t* vertex_shader_path, const wchar_t* pixel_shader_path);
+	MaterialPtr createMaterial(const MaterialPtr& material);
 	void setMaterial(const MaterialPtr& material);
 	void getVertexMeshLayoutShaderByteCodeAndSize(void** byte_code, size_t* size);
 public://Singleton Behavior
