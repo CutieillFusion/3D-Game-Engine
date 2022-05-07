@@ -136,6 +136,9 @@ RECT Window::getClientWindowRect()
 {
 	RECT rc;
 	::GetClientRect(this->m_hwnd, &rc);
+	::ClientToScreen(this->m_hwnd, (LPPOINT)&rc.left);
+	::ClientToScreen(this->m_hwnd, (LPPOINT)&rc.right);
+
 	return rc;
 }
 

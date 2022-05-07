@@ -1,4 +1,4 @@
-#include "AppWindow.h"
+#include "SpaceShooterGame.h"
 #include "InputSystem.h"
 
 //Entry Point of the Entire Program
@@ -15,7 +15,7 @@ int main()
 	{
 		try
 		{
-			AppWindow app;
+			SpaceShooterGame app;
 			while (app.isRun());
 		}
 		catch (...)
