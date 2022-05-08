@@ -88,6 +88,9 @@
     <ClInclude Include="SpaceShooterGame.h">
       <Filter>App\SpaceShooterGame</Filter>
     </ClInclude>
+    <ClInclude Include="MathUtils.h">
+      <Filter>GameEngine\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
