@@ -1,18 +1,12 @@
 # 3D-Game-Engine
 Making a 3D Game Engine
 
-What I Want:
-- Rendering
-- Texturing
-- Lighting
-- Entity Component System
-- Animations
-- UI
-- Collision
-- Physics
+This might be going through a render system swap from DirectX -> OpenGl
 
 Resources:
 - Graphics Engine: https://www.youtube.com/playlist?list=PLv8DnRaQOs5-ST_VDqgbbMRtzMtpK36Hy
+- New Graphics Engine: https://ogldev.org/ 
+- OpenGl Programming Book: https://www.cs.utexas.edu/users/fussell/courses/cs354/handouts/Addison.Wesley.OpenGL.Programming.Guide.8th.Edition.Mar.2013.ISBN.0321773039.pdf
 - 3D GJK Collision: https://blog.hamaluik.ca/posts/building-a-collision-engine-part-3-3d-gjk-collision-detection/
 - Physics Engine: https://www.youtube.com/watch?v=-_IspRG548E
 - GJK Collision: https://www.youtube.com/watch?v=MDusDn8oTSE
