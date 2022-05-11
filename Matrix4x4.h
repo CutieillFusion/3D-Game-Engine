@@ -73,36 +73,38 @@ public:
 
 	void Inverse() 
 	{
-		//int a, i, j;
-		//Matrix4x4 out;
-		//Vector4D v, vec[3];
-		//float det = 0.0f;
-
-		//det = this->getDeterminant();
-		//if (!det) return;
-		//for (i = 0; i < 4; i++)
-		//{
-		//	for (j = 0; j < 4; j++)
-		//	{
-		//		if (j != i)
-		//		{
-		//			a = j;
-		//			if (j > i) a = a - 1;
-		//			vec[a].m_x = (this->m_mat[j][0]);
-		//			vec[a].m_y = (this->m_mat[j][1]);
-		//			vec[a].m_z = (this->m_mat[j][2]);
-		//			vec[a].m_w = (this->m_mat[j][3]);
-		//		}
-		//	}
-		//	v.cross(vec[0], vec[1], vec[2]);
-
-		//	out.m_mat[0][i] = (float)pow(-1.0f, i) * v.m_x / det;
-		//	out.m_mat[1][i] = (float)pow(-1.0f, i) * v.m_y / det;
-		//	out.m_mat[2][i] = (float)pow(-1.0f, i) * v.m_z / det;
-		//	out.m_mat[3][i] = (float)pow(-1.0f, i) * v.m_w / det;
-		//}
-
-		//this->setMatrix(out);
+		int a, i, j;
+		Matrix4x4 out;
+		float x1, y1, z1, w1;
+		float x[3], y[3], z[3], w[3];
+		float det = 0.0f;
+		
+		det = this->getDeterminant();
+		if(!det) return;
+		for(i = 0; i < 4; i++)
+		{
+			for(j = 0; j < 4; j++)
+			{
+				if(j != i)
+				{
+					a = j;
+					if(j > i) 
+					{
+						--a;
+					}
+					x[a] = mat[j][0];
+					y[a] = mat[j][1];
+					z[a] = mat[j][2];
+					w[a] = mat[j][3];
+				}
+			}
+			out.mat[0][i] = (float)pow(-1.0f, i) *  (y[0] * (z[1] * w[2] - z[2] * w[1]) - z[0] * (y[1] * w[2] - y[2] * w[1]) + w[0] * (y[1] * z[2] - z[1] * y[2])) / det;
+			out.mat[1][i] = (float)pow(-1.0f, i) * -(x[0] * (z[1] * w[2] - z[2] * w[1]) - z[0] * (x[1] * w[2] - x[2] * w[1]) + w[0] * (x[1] * z[2] - x[2] * z[1])) / det;
+			out.mat[2][i] = (float)pow(-1.0f, i) *  (x[0] * (y[1] * w[2] - y[2] * w[1]) - y[0] * (x[1] * w[2] - x[2] * w[1]) + w[0] * (x[1] * y[2] - x[2] * y[1])) / det;
+			out.mat[3][i] = (float)pow(-1.0f, i) * -(x[0] * (y[1] * z[2] - y[2] * z[1]) - y[0] * (x[1] * z[2] - x[2] * z[1]) + z[0] * (x[1] * y[2] - x[2] * y[1])) / det;
+		}
+		
+		this->SetMatrix(out);
 	}
 
 	void operator *=(const Matrix4x4 matrix) 
