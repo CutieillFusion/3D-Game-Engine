@@ -1,5 +1,6 @@
 #pragma once
-#include <memory>
+#include <memory> 
+
 class Matrix4x4
 {
 public:
@@ -11,10 +12,10 @@ public:
 	void SetIdentity()
 	{
 		::memset(mat, 0, sizeof(float) * 16);
-		mat[0][0] = 1;
-		mat[1][1] = 1;
-		mat[2][2] = 1;
-		mat[3][3] = 1;
+		mat[0][0] = 1.0f;
+		mat[1][1] = 1.0f;
+		mat[2][2] = 1.0f;
+		mat[3][3] = 1.0f;
 	}
 
 	void SetTranslation(float x, float y, float z)
@@ -56,39 +57,37 @@ public:
 		mat[1][1] = (float)cos(z);
 	}
 
-	float GetDeterminant() 
+	float GetDeterminant()
 	{
-		float det = -(
-			mat[0][3] *  (mat[1][0] * (mat[2][1] * mat[3][2] - mat[2][2] * mat[3][1]) - mat[2][0] * (mat[1][1] * mat[3][2] - mat[1][2] * mat[3][1]) + mat[3][0] * (mat[1][1] * mat[2][2] - mat[2][1] * mat[1][1]))
-			+ 
+		return -(
+			mat[0][3] * (mat[1][0] * (mat[2][1] * mat[3][2] - mat[2][2] * mat[3][1]) - mat[2][0] * (mat[1][1] * mat[3][2] - mat[1][2] * mat[3][1]) + mat[3][0] * (mat[1][1] * mat[2][2] - mat[2][1] * mat[1][2]))
+			+
 			mat[1][3] * -(mat[0][0] * (mat[2][1] * mat[3][2] - mat[2][2] * mat[3][1]) - mat[2][0] * (mat[0][1] * mat[3][2] - mat[0][2] * mat[3][1]) + mat[3][0] * (mat[0][1] * mat[2][2] - mat[0][2] * mat[2][1]))
-			+ 
-			mat[2][3] *  (mat[0][0] * (mat[1][1] * mat[3][2] - mat[1][2] * mat[3][1]) - mat[1][0] * (mat[0][1] * mat[3][2] - mat[0][2] * mat[3][1]) + mat[3][0] * (mat[0][1] * mat[1][2] - mat[0][2] * mat[1][1]))
-			+ 
-			mat[3][3] * -(mat[0][0] * (mat[2][1] * mat[3][2] - mat[2][2] * mat[3][1]) - mat[1][0] * (mat[0][1] * mat[2][2] - mat[0][2] * mat[2][1]) + mat[2][0] * (mat[0][1] * mat[1][2] - mat[0][2] * mat[1][1]))
+			+
+			mat[2][3] * (mat[0][0] * (mat[1][1] * mat[3][2] - mat[1][2] * mat[3][1]) - mat[1][0] * (mat[0][1] * mat[3][2] - mat[0][2] * mat[3][1]) + mat[3][0] * (mat[0][1] * mat[1][2] - mat[0][2] * mat[1][1]))
+			+
+			mat[3][3] * -(mat[0][0] * (mat[1][1] * mat[2][2] - mat[1][2] * mat[2][1]) - mat[1][0] * (mat[0][1] * mat[2][2] - mat[0][2] * mat[2][1]) + mat[2][0] * (mat[0][1] * mat[1][2] - mat[0][2] * mat[1][1]))
 			);
-
-		return det;
 	}
 
-	void Inverse() 
+	void Inverse()
 	{
 		int a, i, j;
 		Matrix4x4 out;
 		float x1, y1, z1, w1;
 		float x[3], y[3], z[3], w[3];
 		float det = 0.0f;
-		
-		det = this->getDeterminant();
-		if(!det) return;
-		for(i = 0; i < 4; i++)
+
+		det = this->GetDeterminant();
+		if (!det) return;
+		for (i = 0; i < 4; i++)
 		{
-			for(j = 0; j < 4; j++)
+			for (j = 0; j < 4; j++)
 			{
-				if(j != i)
+				if (j != i)
 				{
 					a = j;
-					if(j > i) 
+					if (j > i)
 					{
 						--a;
 					}
@@ -98,16 +97,16 @@ public:
 					w[a] = mat[j][3];
 				}
 			}
-			out.mat[0][i] = (float)pow(-1.0f, i) *  (y[0] * (z[1] * w[2] - z[2] * w[1]) - z[0] * (y[1] * w[2] - y[2] * w[1]) + w[0] * (y[1] * z[2] - z[1] * y[2])) / det;
+			out.mat[0][i] = (float)pow(-1.0f, i) * (y[0] * (z[1] * w[2] - z[2] * w[1]) - z[0] * (y[1] * w[2] - y[2] * w[1]) + w[0] * (y[1] * z[2] - z[1] * y[2])) / det;
 			out.mat[1][i] = (float)pow(-1.0f, i) * -(x[0] * (z[1] * w[2] - z[2] * w[1]) - z[0] * (x[1] * w[2] - x[2] * w[1]) + w[0] * (x[1] * z[2] - x[2] * z[1])) / det;
-			out.mat[2][i] = (float)pow(-1.0f, i) *  (x[0] * (y[1] * w[2] - y[2] * w[1]) - y[0] * (x[1] * w[2] - x[2] * w[1]) + w[0] * (x[1] * y[2] - x[2] * y[1])) / det;
+			out.mat[2][i] = (float)pow(-1.0f, i) * (x[0] * (y[1] * w[2] - y[2] * w[1]) - y[0] * (x[1] * w[2] - x[2] * w[1]) + w[0] * (x[1] * y[2] - x[2] * y[1])) / det;
 			out.mat[3][i] = (float)pow(-1.0f, i) * -(x[0] * (y[1] * z[2] - y[2] * z[1]) - y[0] * (x[1] * z[2] - x[2] * z[1]) + z[0] * (x[1] * y[2] - x[2] * y[1])) / det;
 		}
-		
+
 		this->SetMatrix(out);
 	}
 
-	void operator *=(const Matrix4x4 matrix) 
+	void operator *=(const Matrix4x4 matrix)
 	{
 		Matrix4x4 out;
 
@@ -124,7 +123,7 @@ public:
 		::memcpy(mat, matrix.mat, sizeof(float) * 16);
 	}
 
-	void SetMatrix(const Matrix4x4& matrix) 
+	void SetMatrix(const Matrix4x4& matrix)
 	{
 		::memcpy(mat, matrix.mat, sizeof(float) * 16);
 	}
@@ -150,7 +149,19 @@ public:
 		mat[3][2] = -(near_plane / (far_plane - near_plane));
 	}
 
-	~Matrix4x4() 
+	void Print() 
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				std::cout << mat[i][j] << " ";
+			}
+			std::cout << "\n";
+		}
+	}
+
+	~Matrix4x4()
 	{
 
 	}
@@ -158,3 +169,5 @@ public:
 	float mat[4][4];
 
 };
+
+
