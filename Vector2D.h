@@ -24,7 +24,7 @@ public:
 
 	static float Dot(const Vector2D& v1, const Vector2D& v2) 
 	{
-		return (v1.x * v1.y) + (v1.y * v2.y);
+		return (v1.x * v2.x) + (v1.y * v2.y);
 	}
 
 	static Vector2D Lerp(const Vector2D& start, const Vector2D& end, float delta) 
@@ -44,7 +44,7 @@ public:
 
 	Vector2D operator /(float num)
 	{
-		return Vector2D(x / num, y / num);
+		return Vector2D(num / x, num / y);
 	}
 
 	Vector2D operator +(Vector2D vec)
