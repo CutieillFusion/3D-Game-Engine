@@ -3,6 +3,8 @@ Making a 3D Game Engine
 
 This might be going through a render system swap from DirectX -> OpenGl
 
+Eventually I'd like to have mulitple graphics Engines so this works crossplatform with great performance just need to learn how computer graphics work 
+
 Resources:
 - Graphics Engine: https://www.youtube.com/playlist?list=PLv8DnRaQOs5-ST_VDqgbbMRtzMtpK36Hy
 - New Graphics Engine: https://ogldev.org/ 
